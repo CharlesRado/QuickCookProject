@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.QuickCook_Project"
+        tools:targetApi="31">
+
+        <!-- HomeActivity -->
+        <activity
+            android:name=".welcome.HomeActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- LoginActivity -->
+        <activity
+            android:name=".authentications.LoginActivity"
+            android:exported="true" />
+
+        <!-- SigninActivity -->
+        <activity
+            android:name=".authentications.SigninActivity"
+            android:exported="true" />
+
+        <!-- ForgotPasswordActivity -->
+        <activity
+            android:name=".authentications.ForgotPasswordActivity"
+            android:exported="true" />
+
+        <!-- MainActivity -->
+        <activity
+            android:name=".screens.MainActivity"
+            android:exported="true" />
+
+        <!-- RecipesActivity -->
+        <activity
+            android:name=".screens.RecipesActivity"
+            android:exported="true" />
+
+        <!-- RecipesDetailsActivity -->
+        <activity
+            android:name=".screens.RecipeDetailsActivity"
+            android:exported="true" />
+    </application>
+
+</manifest>

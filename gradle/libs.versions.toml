@@ -1,0 +1,86 @@
+[versions]
+activityCompose = "1.9.3"
+agp = "8.7.3"
+androidxMaterial = "1.2.1"
+androidxNavigationCompose = "2.5.3"
+bcrypt = "0.9.0"
+coilCompose = "2.4.0"
+facebookAndroidSdk = "latest.release"
+facebookAndroidSdkVersion = "15.0.2"
+firebaseBom = "33.7.0"
+firebaseBomVersion = "33.5.1"
+gson = "2.10.1"
+httpclient = "4.5.14"
+httpcore = "4.4.16"
+kotlin = "1.9.0"
+coreKtx = "1.15.0"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+appcompat = "1.7.0"
+lifecycleRuntimeCompose = "2.8.7"
+material = "1.12.0"
+activity = "1.9.3"
+constraintlayout = "2.2.0"
+material3 = "<version>"
+material3Version = "1.1.0"
+materialVersion = "1.7.5"
+navigationCompose = "2.8.5"
+okhttp = "4.9.3"
+playServicesAuth = "21.3.0"
+playServicesAuthVersion = "21.0.1"
+sendgridSendgridJava = "4.10.1"
+storage = "1.5.0"
+runtimeAndroid = "1.7.5"
+ui = "1.7.5"
+uiAndroid = "1.7.5"
+uiVersion = "1.2.1"
+firebaseStorageKtx = "21.0.1"
+
+[libraries]
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
+androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
+androidx-material-v121 = { module = "androidx.compose.material:material", version.ref = "androidxMaterial" }
+androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+androidx-material3-v110 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-compose-v253 = { module = "androidx.navigation:navigation-compose", version.ref = "androidxNavigationCompose" }
+androidx-ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
+androidx-ui-v121 = { module = "androidx.compose.ui:ui", version.ref = "uiVersion" }
+bcrypt = { module = "at.favre.lib:bcrypt", version.ref = "bcrypt" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+com-google-firebase-firebase-auth3 = { module = "com.google.firebase:firebase-auth" }
+facebook-android-sdk = { module = "com.facebook.android:facebook-android-sdk", version.ref = "facebookAndroidSdk" }
+facebook-android-sdk-v1502 = { module = "com.facebook.android:facebook-android-sdk", version.ref = "facebookAndroidSdkVersion" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-bom-v3351 = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
+firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx" }
+gms-play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
+google-firebase-auth = { module = "com.google.firebase:firebase-auth" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "httpclient" }
+httpcore = { module = "org.apache.httpcomponents:httpcore", version.ref = "httpcore" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-storage = { group = "androidx.test.services", name = "storage", version.ref = "storage" }
+androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime-android", version.ref = "runtimeAndroid" }
+androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth" }
+play-services-auth-v2101 = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersion" }
+sendgrid-sendgrid-java = { module = "com.sendgrid:sendgrid-java", version.ref = "sendgridSendgridJava" }
+firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+

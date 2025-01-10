@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "575296863611",
+    "project_id": "quickcook-4145e",
+    "storage_bucket": "quickcook-4145e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:575296863611:android:3b87f1da72e31a538ed1de",
+        "android_client_info": {
+          "package_name": "com.example.quickcook_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "575296863611-0nlnc9qke0vq1qsgvm4j0g32uanb78de.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.quickcook_project",
+            "certificate_hash": "47aeaf0c16e8736ccc87327687e659ac4a9ed2c7"
+          }
+        },
+        {
+          "client_id": "575296863611-8rhoi6hlgmk0534t9m5up0pl4m0u1gea.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_iOoa6hB-8vCGF-d8Cv4NNrQA9PTiBik"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "575296863611-8rhoi6hlgmk0534t9m5up0pl4m0u1gea.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

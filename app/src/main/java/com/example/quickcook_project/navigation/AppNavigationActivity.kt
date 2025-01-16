@@ -10,6 +10,9 @@ import com.example.quickcook_project.screens.ProfileScreen
 import com.example.quickcook_project.screens.RecipeDetailsScreen
 import com.example.quickcook_project.screens.RecipesScreen
 import com.example.quickcook_project.screens.StatisticsScreen
+import java.net.URLEncoder
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 @Composable
 fun AppNavigationActivity(navController: NavHostController) {
@@ -48,9 +51,20 @@ fun AppNavigationActivity(navController: NavHostController) {
                 onBack = {
                     navController.popBackStack() // Revenir en arrière
                 },
+                
                 onRecipeClick = { selectedRecipe ->
+                    val encodedIngredients = encodeForNavigation(selectedRecipe.ingredients.joinToString(";"))
+                    val encodedSteps = encodeForNavigation(selectedRecipe.steps.joinToString(";"))
+                    val encodedName = encodeForNavigation(selectedRecipe.name)
+                    val encodedCategory = encodeForNavigation(selectedRecipe.category)
+                    val encodedMeal = encodeForNavigation(selectedRecipe.meal)
+                    val encodedImageUrl = encodeForNavigation(selectedRecipe.imageUrl)
+                    val encodedPreparationTime = encodeForNavigation(selectedRecipe.preparationTime)
+                    val encodedDifficulty = encodeForNavigation(selectedRecipe.difficulty)
+                    val encodedCalories = encodeForNavigation(selectedRecipe.calories)
+
                     navController.navigate(
-                        "recipeDetails/${selectedRecipe.name}/${selectedRecipe.description}/${selectedRecipe.imageUrl}/${selectedRecipe.time}/${selectedRecipe.difficulty}/${selectedRecipe.calories}"
+                        "recipeDetails/$encodedName/$encodedCategory/$encodedMeal/$encodedImageUrl/$encodedPreparationTime/$encodedDifficulty/$encodedCalories/$encodedIngredients/$encodedSteps"
                     )
                 }
             )
@@ -73,31 +87,47 @@ fun AppNavigationActivity(navController: NavHostController) {
                     navController.popBackStack() // Revenir en arrière
                 },
                 onRecipeClick = { selectedRecipe ->
+                    val encodedIngredients = encodeForNavigation(selectedRecipe.ingredients.joinToString(";"))
+                    val encodedSteps = encodeForNavigation(selectedRecipe.steps.joinToString(";"))
+                    val encodedName = encodeForNavigation(selectedRecipe.name)
+                    val encodedCategory = encodeForNavigation(selectedRecipe.category)
+                    val encodedMeal = encodeForNavigation(selectedRecipe.meal)
+                    val encodedImageUrl = encodeForNavigation(selectedRecipe.imageUrl)
+                    val encodedPreparationTime = encodeForNavigation(selectedRecipe.preparationTime)
+                    val encodedDifficulty = encodeForNavigation(selectedRecipe.difficulty)
+                    val encodedCalories = encodeForNavigation(selectedRecipe.calories)
+
                     navController.navigate(
-                        "recipeDetails/${selectedRecipe.name}/${selectedRecipe.description}/${selectedRecipe.imageUrl}/${selectedRecipe.time}/${selectedRecipe.difficulty}/${selectedRecipe.calories}"
+                        "recipeDetails/$encodedName/$encodedCategory/$encodedMeal/$encodedImageUrl/$encodedPreparationTime/$encodedDifficulty/$encodedCalories/$encodedIngredients/$encodedSteps"
                     )
                 }
             )
         }
 
         composable(
-            route = "recipeDetails/{name}/{description}/{imageUrl}/{time}/{difficulty}/{calories}",
+            route = "recipeDetails/{name}/{category}/{meal}/{imageUrl}/{preparationTime}/{difficulty}/{calories}/{ingredients}/{steps}",
             arguments = listOf(
                 navArgument("name") { defaultValue = "Unknown" },
-                navArgument("description") { defaultValue = "No description available." },
+                navArgument("category") { defaultValue = "" },
+                navArgument("meal") { defaultValue = "" },
                 navArgument("imageUrl") { defaultValue = "" },
-                navArgument("time") { defaultValue = "N/A" },
+                navArgument("preparationTime") { defaultValue = "N/A" },
                 navArgument("difficulty") { defaultValue = "N/A" },
-                navArgument("calories") { defaultValue = "N/A" }
+                navArgument("calories") { defaultValue = "0" },
+                navArgument("ingredients") { defaultValue = "" },
+                navArgument("steps") { defaultValue = "" }
             )
         ) { backStackEntry ->
             RecipeDetailsScreen(
-                name = backStackEntry.arguments?.getString("name") ?: "Unknown Recipe",
-                description = backStackEntry.arguments?.getString("description") ?: "No description available.",
-                imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: "",
-                time = backStackEntry.arguments?.getString("time") ?: "N/A",
-                difficulty = backStackEntry.arguments?.getString("difficulty") ?: "N/A",
-                calories = backStackEntry.arguments?.getString("calories") ?: "N/A"
+                name = decodeFromNavigation(backStackEntry.arguments?.getString("name") ?: "Unknown"),
+                category = decodeFromNavigation(backStackEntry.arguments?.getString("category") ?: ""),
+                meal = decodeFromNavigation(backStackEntry.arguments?.getString("meal") ?: ""),
+                imageUrl = decodeFromNavigation(backStackEntry.arguments?.getString("imageUrl") ?: ""),
+                preparationTime = decodeFromNavigation(backStackEntry.arguments?.getString("preparationTime") ?: "N/A"),
+                difficulty = decodeFromNavigation(backStackEntry.arguments?.getString("difficulty") ?: "N/A"),
+                calories = decodeFromNavigation(backStackEntry.arguments?.getString("calories") ?: "0"),
+                ingredients = decodeFromNavigation(backStackEntry.arguments?.getString("ingredients") ?: "").split(";"),
+                steps = decodeFromNavigation(backStackEntry.arguments?.getString("steps") ?: "").split(";")
             )
         }
 
@@ -134,10 +164,20 @@ fun AppNavigationActivity(navController: NavHostController) {
         // Settings Screen
         composable("settings") {
             SettingsScreen()
-        }*/
+        }
 
         composable("stats") {
             StatisticsScreen()
-        }
+        }*/
     }
+}
+
+// Encodage de l'URL pour éviter les problèmes avec les caractères spéciaux
+fun encodeForNavigation(input: String): String {
+    return URLEncoder.encode(input, StandardCharsets.UTF_8.toString())
+}
+
+// Decodage de l'URL pour éviter les problèmes avec les caractères spéciaux
+fun decodeFromNavigation(input: String): String {
+    return URLDecoder.decode(input, StandardCharsets.UTF_8.toString())
 }

@@ -3,6 +3,7 @@ package com.example.quickcook_project.screens
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.ui.Alignment
@@ -15,6 +16,10 @@ import coil.compose.AsyncImage
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import com.example.quickcook_project.R
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 
 
 class RecipeDetailsActivity : ComponentActivity() {
@@ -22,20 +27,26 @@ class RecipeDetailsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val name = intent.getStringExtra("name") ?: "Unknown Recipe"
-        val description = intent.getStringExtra("description") ?: "No description available."
+        val category = intent.getStringExtra("category") ?: ""
+        val meal = intent.getStringExtra("meal") ?: ""
         val imageUrl = intent.getStringExtra("imageUrl") ?: ""
-        val time = intent.getStringExtra("time") ?: "N/A"
+        val preparationTime = intent.getStringExtra("preparationTime") ?: "N/A"
         val difficulty = intent.getStringExtra("difficulty") ?: "N/A"
-        val calories = intent.getStringExtra("calories") ?: "N/A"
+        val calories = intent.getStringExtra("calories") ?: "0"
+        val ingredients = intent.getStringExtra("ingredients")?.split(",") ?: emptyList()
+        val steps = intent.getStringExtra("steps")?.split(",") ?: emptyList()
 
         setContent {
             RecipeDetailsScreen(
                 name = name,
-                description = description,
+                category = category,
+                meal = meal,
                 imageUrl = imageUrl,
-                time = time,
+                preparationTime = preparationTime,
                 difficulty = difficulty,
-                calories = calories
+                calories = calories,
+                ingredients = ingredients,
+                steps = steps
             )
         }
     }
@@ -44,65 +55,140 @@ class RecipeDetailsActivity : ComponentActivity() {
 @Composable
 fun RecipeDetailsScreen(
     name: String,
-    description: String,
+    category: String,
+    meal: String,
     imageUrl: String,
-    time: String,
+    preparationTime: String,
     difficulty: String,
-    calories: String
+    calories: String,
+    ingredients: List<String>,
+    steps: List<String>
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color(0xFF7F3C3C)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
         ) {
-            // Back button
-            IconButton(onClick = { /* Handle back navigation */ }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_previous),
-                    contentDescription = "Back",
-                    tint = Color.White
+            item {
+                // Image et bouton de retour
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                ) {
+                    // Image principale
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    // Bouton de retour
+                    IconButton(
+                        onClick = { /* Handle back navigation */ },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .align(Alignment.TopStart)
+                            .padding(16.dp)
+                            .clip(CircleShape)
+                            .background(Color.White)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_previous),
+                            contentDescription = "Back",
+                            tint = Color(0xFF7F3C3C)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Titre de la recette
+                Text(
+                    text = name,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
-            }
 
-            // Recipe image
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = name,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                alignment = Alignment.Center
-            )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+                // Détails de la recette
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Text(
+                        text = "Category: $category",
+                        fontSize = 16.sp,
+                        color = Color.LightGray,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                    Text(
+                        text = "Meal: $meal",
+                        fontSize = 16.sp,
+                        color = Color.LightGray
+                    )
+                }
 
-            // Recipe details
-            Text(
-                text = name,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Text(
-                text = description,
-                fontSize = 16.sp,
-                color = Color.LightGray,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                RecipeInfoItem(icon = R.drawable.ic_time, label = time)
-                RecipeInfoItem(icon = R.drawable.ic_difficulty, label = difficulty)
-                RecipeInfoItem(icon = R.drawable.ic_calories, label = calories)
+                // Informations sur la recette
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    RecipeInfoItem(icon = R.drawable.ic_time, label = preparationTime)
+                    RecipeInfoItem(icon = R.drawable.ic_difficulty, label = difficulty)
+                    RecipeInfoItem(icon = R.drawable.ic_calories, label = calories)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Ingrédients
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Text(
+                        text = "Ingredients",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = Color.White,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                    ingredients.forEach { ingredient ->
+                        Text(
+                            text = "• $ingredient",
+                            fontSize = 16.sp,
+                            color = Color.LightGray,
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Étapes
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Text(
+                        text = "Steps:",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                    steps.forEachIndexed { index, step ->
+                        Text(
+                            text = "${index + 1}. $step",
+                            fontSize = 16.sp,
+                            color = Color.LightGray,
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(64.dp))
             }
         }
     }
@@ -110,13 +196,19 @@ fun RecipeDetailsScreen(
 
 @Composable
 fun RecipeInfoItem(icon: Int, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Icon(
             painter = painterResource(id = icon),
             contentDescription = label,
             modifier = Modifier.size(24.dp),
             tint = Color.White
         )
-        Text(text = label, fontSize = 14.sp, color = Color.White)
+        Text(
+            text = label,
+            fontSize = 14.sp,
+            color = Color.White
+        )
     }
 }

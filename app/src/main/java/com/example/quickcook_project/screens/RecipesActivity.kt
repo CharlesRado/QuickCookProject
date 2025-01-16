@@ -20,15 +20,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.style.TextAlign
 import coil.compose.AsyncImage
 import com.example.quickcook_project.R
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.foundation.background
+import androidx.compose.ui.draw.clip
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -62,8 +63,11 @@ class RecipesActivity : ComponentActivity() {
                         },
                         onBack = { finish() }, // Revenir en arrière
                         onRecipeClick = { selectedRecipe ->
+                            val ingredients = selectedRecipe.ingredients.joinToString(";")
+                            val steps = selectedRecipe.steps.joinToString(";")
+
                             navController.navigate(
-                                "recipeDetails/${selectedRecipe.name}/${selectedRecipe.description}/${selectedRecipe.imageUrl}/${selectedRecipe.time}/${selectedRecipe.difficulty}/${selectedRecipe.calories}"
+                                "recipeDetails/${selectedRecipe.name}/${selectedRecipe.category}/${selectedRecipe.meal}/${selectedRecipe.imageUrl}/${selectedRecipe.preparationTime}/${selectedRecipe.difficulty}/${selectedRecipe.calories}/${ingredients}/${steps}"
                             )
                         }
                     )
@@ -80,23 +84,29 @@ class RecipesActivity : ComponentActivity() {
 
                 // Route pour RecipeDetailsScreen
                 composable(
-                    route = "recipeDetails/{name}/{description}/{imageUrl}/{time}/{difficulty}/{calories}",
+                    route = "recipeDetails/{name}/{category}/{meal}/{imageUrl}/{preparationTime}/{difficulty}/{calories}/{ingredients}/{steps}",
                     arguments = listOf(
                         navArgument("name") { defaultValue = "Unknown" },
-                        navArgument("description") { defaultValue = "No description available." },
+                        navArgument("category") { defaultValue = "" },
+                        navArgument("meal") { defaultValue = "" },
                         navArgument("imageUrl") { defaultValue = "" },
-                        navArgument("time") { defaultValue = "N/A" },
+                        navArgument("preparationTime") { defaultValue = "N/A" },
                         navArgument("difficulty") { defaultValue = "N/A" },
-                        navArgument("calories") { defaultValue = "N/A" }
+                        navArgument("calories") { defaultValue = "0" },
+                        navArgument("ingredients") { defaultValue = "" },
+                        navArgument("steps") { defaultValue = "" }
                     )
                 ) { backStackEntry ->
                     RecipeDetailsScreen(
                         name = backStackEntry.arguments?.getString("name") ?: "Unknown",
-                        description = backStackEntry.arguments?.getString("description") ?: "No description available.",
+                        category = backStackEntry.arguments?.getString("category") ?: "",
+                        meal = backStackEntry.arguments?.getString("meal") ?: "",
                         imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: "",
-                        time = backStackEntry.arguments?.getString("time") ?: "N/A",
+                        preparationTime = backStackEntry.arguments?.getString("preparationTime") ?: "N/A",
                         difficulty = backStackEntry.arguments?.getString("difficulty") ?: "N/A",
-                        calories = backStackEntry.arguments?.getString("calories") ?: "N/A"
+                        calories = backStackEntry.arguments?.getString("calories") ?: "0",
+                        ingredients = backStackEntry.arguments?.getString("ingredients")?.split(",") ?: emptyList(),
+                        steps = backStackEntry.arguments?.getString("steps")?.split(",") ?: emptyList()
                     )
                 }
             }
@@ -136,6 +146,7 @@ fun RecipesScreen(
         }
     }
 
+    // Récupération des recettes depuis Firestore
     LaunchedEffect(filterType, filterValue) {
         val query = when (filterType) {
             "category" -> firestore.collection("recipes").whereEqualTo("category", filterValue)
@@ -145,18 +156,40 @@ fun RecipesScreen(
 
         query.get()
             .addOnSuccessListener { documents ->
-                val fetchedRecipes = documents.map { doc ->
-                    Recipe(
+                val fetchedRecipes = mutableListOf<Recipe>()
+                documents.forEach { doc ->
+                    val ingredientsReferences = doc.data
+                        .filterKeys { it.startsWith("ingredient") }
+                        .mapNotNull { (_, value) -> value as? com.google.firebase.firestore.DocumentReference }
+
+                    val recipe = Recipe(
                         name = doc.getString("name") ?: "",
-                        description = doc.getString("description") ?: "",
-                        imageUrl = doc.getString("imageUrl") ?: "",
-                        time = doc.getString("preparation_time") ?: "",
+                        category = doc.getString("category") ?: "",
+                        calories = doc.getString("calories") ?: "0",
                         difficulty = doc.getString("difficulty") ?: "",
-                        calories = doc.getString("calories") ?: ""
+                        imageUrl = doc.getString("imageUrl") ?: "",
+                        meal = doc.getString("meal") ?: "",
+                        preparationTime = doc.getString("preparation_time") ?: "",
+                        ingredients = emptyList(), // On chargera les ingrédients après
+                        steps = doc.get("steps") as? List<String> ?: emptyList()
                     )
+
+                    // Charger les données des ingrédients
+                    val ingredientNames = mutableListOf<String>()
+                    val ingredientTasks = ingredientsReferences.map { ref ->
+                        ref.get().addOnSuccessListener { ingredientDoc ->
+                            ingredientNames.add(ingredientDoc.getString("name") ?: "Unknown")
+                        }
+                    }
+
+                    // Attendre que tous les ingrédients soient chargés
+                    Tasks.whenAllSuccess<Void>(ingredientTasks).addOnCompleteListener {
+                        recipe.ingredients = ingredientNames
+                        fetchedRecipes.add(recipe)
+                        recipes = fetchedRecipes
+                        isLoading = false
+                    }
                 }
-                recipes = fetchedRecipes
-                isLoading = false
             }
             .addOnFailureListener { exception ->
                 errorMessage = exception.message
@@ -255,8 +288,11 @@ fun RecipesScreen(
                                     color = Color(0xFF7F3C3C),
                                     style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
                                 )
+
+
                             }
                         }
+                        Spacer(modifier = Modifier.width(64.dp))
                     }
                 }
             }
@@ -268,49 +304,20 @@ fun RecipesScreen(
 fun RecipeCard(recipe: Recipe, onClick: (Recipe) -> Unit) {
     Card(
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick(recipe) },
+        modifier = Modifier.fillMaxWidth().clickable { onClick(recipe) },
         elevation = 4.dp
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Image of the recipe
-            Card(
-                shape = CircleShape, // Définit la forme circulaire
-                modifier = Modifier
-                    .size(60.dp)
-                    .background(Color.White),
-                elevation = 4.dp // Ajoute une ombre légère
-            ) {
-                AsyncImage(
-                    model = recipe.imageUrl,
-                    contentDescription = recipe.name,
-                    contentScale = ContentScale.Crop, // Ajuste l'image pour qu'elle remplisse la forme
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-
+        Row(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            AsyncImage(
+                model = recipe.imageUrl,
+                contentDescription = recipe.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(60.dp).background(Color.White).clip(CircleShape)
+            )
             Spacer(modifier = Modifier.width(16.dp))
-
-            // Recipe details
             Column {
-                Text(
-                    text = recipe.name,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                Text(
-                    text = "Ingredients: ${recipe.description}",
-                    fontSize = 14.sp,
-                    color = Color.Gray,
-                    textAlign = TextAlign.Start
-                )
+                Text(text = recipe.name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(text = "Ingredients: ${recipe.ingredients.joinToString(", ")}", fontSize = 14.sp, color = Color.Gray)
             }
         }
     }
@@ -319,11 +326,14 @@ fun RecipeCard(recipe: Recipe, onClick: (Recipe) -> Unit) {
 // Recipe data class
 data class Recipe(
     val name: String,
-    val description: String,
+    val category: String,
+    val meal: String,
     val imageUrl: String,
-    val time: String,
+    val preparationTime: String,
     val difficulty: String,
-    val calories: String
+    val calories: String,
+    var ingredients: List<String>,
+    val steps: List<String>
 )
 
 @Composable

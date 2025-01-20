@@ -22,15 +22,16 @@ fun AppNavigationActivity(navController: NavHostController) {
         composable("home") {
             HomeScreen(
                 onCategorySelected = { category ->
-                    // Naviguer vers la page des recettes pour cette catégorie
+                    // navigate to the recipes page for this category
                     navController.navigate("recipes/category/$category")
                 },
                 onMealSelected = { meal ->
-                    // Naviguer vers la page des recettes pour ce type de repas
+                    // navigate to the recipes page for this type of meal
                     navController.navigate("recipes/meal/$meal")
                 },
                 onNavigateToProfile = {
-                    navController.navigate("profile") // Navigation vers la page de profil
+                    // navigate to profile page
+                    navController.navigate("profile")
                 }
             )
         }
@@ -43,13 +44,13 @@ fun AppNavigationActivity(navController: NavHostController) {
             RecipesScreen(
                 filterType = "category",
                 filterValue = category,
-                username = "Mickael", // Passez les données nécessaires
-                profileImageUrl = "", // Ajoutez l'URL de l'image de profil si disponible
+                username = "Mickael",
+                profileImageUrl = "",
                 onNavigateToProfile = {
                     navController.navigate("profile")
                 },
                 onBack = {
-                    navController.popBackStack() // Revenir en arrière
+                    navController.popBackStack()
                 },
                 
                 onRecipeClick = { selectedRecipe ->
@@ -78,13 +79,13 @@ fun AppNavigationActivity(navController: NavHostController) {
             RecipesScreen(
                 filterType = "meal",
                 filterValue = meal,
-                username = "Mickael", // Passez les données nécessaires
-                profileImageUrl = "", // Ajoutez l'URL de l'image de profil si disponible
+                username = "Mickael",
+                profileImageUrl = "",
                 onNavigateToProfile = {
                     navController.navigate("profile")
                 },
                 onBack = {
-                    navController.popBackStack() // Revenir en arrière
+                    navController.popBackStack()
                 },
                 onRecipeClick = { selectedRecipe ->
                     val encodedIngredients = encodeForNavigation(selectedRecipe.ingredients.joinToString(";"))
@@ -127,7 +128,10 @@ fun AppNavigationActivity(navController: NavHostController) {
                 difficulty = decodeFromNavigation(backStackEntry.arguments?.getString("difficulty") ?: "N/A"),
                 calories = decodeFromNavigation(backStackEntry.arguments?.getString("calories") ?: "0"),
                 ingredients = decodeFromNavigation(backStackEntry.arguments?.getString("ingredients") ?: "").split(";"),
-                steps = decodeFromNavigation(backStackEntry.arguments?.getString("steps") ?: "").split(";")
+                steps = decodeFromNavigation(backStackEntry.arguments?.getString("steps") ?: "").split(";"),
+                onBack = {
+                    navController.popBackStack()
+                }
             )
         }
 
@@ -172,12 +176,12 @@ fun AppNavigationActivity(navController: NavHostController) {
     }
 }
 
-// Encodage de l'URL pour éviter les problèmes avec les caractères spéciaux
+// url encoding to avoid problems with special characters
 fun encodeForNavigation(input: String): String {
     return URLEncoder.encode(input, StandardCharsets.UTF_8.toString())
 }
 
-// Decodage de l'URL pour éviter les problèmes avec les caractères spéciaux
+// url decoding to avoid problems with special characters
 fun decodeFromNavigation(input: String): String {
     return URLDecoder.decode(input, StandardCharsets.UTF_8.toString())
 }

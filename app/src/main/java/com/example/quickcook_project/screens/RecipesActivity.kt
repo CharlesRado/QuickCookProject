@@ -37,13 +37,12 @@ class RecipesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Récupération des paramètres envoyés à l'activité
+        // retrieve parameters sent to the activity
         val filterType = intent.getStringExtra("filterType") ?: "Unknown"
         val filterValue = intent.getStringExtra("filterValue") ?: "Unknown"
         val username = intent.getStringExtra("username") ?: "User"
         val profileImageUrl = intent.getStringExtra("profileImageUrl") ?: ""
 
-        // Contenu Jetpack Compose
         setContent {
             val navController = rememberNavController()
 
@@ -51,7 +50,7 @@ class RecipesActivity : ComponentActivity() {
                 navController = navController,
                 startDestination = "recipes"
             ) {
-                // Route pour RecipesScreen
+                // route to RecipesScreen
                 composable("recipes") {
                     RecipesScreen(
                         filterType = filterType,
@@ -73,7 +72,7 @@ class RecipesActivity : ComponentActivity() {
                     )
                 }
 
-                // Route pour ProfileScreen
+                // route to ProfileScreen
                 composable("profile") {
                     ProfileScreen(
                         onNavigateTo = { destination ->
@@ -82,7 +81,7 @@ class RecipesActivity : ComponentActivity() {
                     )
                 }
 
-                // Route pour RecipeDetailsScreen
+                // route to RecipeDetailsScreen
                 composable(
                     route = "recipeDetails/{name}/{category}/{meal}/{imageUrl}/{preparationTime}/{difficulty}/{calories}/{ingredients}/{steps}",
                     arguments = listOf(
@@ -106,7 +105,8 @@ class RecipesActivity : ComponentActivity() {
                         difficulty = backStackEntry.arguments?.getString("difficulty") ?: "N/A",
                         calories = backStackEntry.arguments?.getString("calories") ?: "0",
                         ingredients = backStackEntry.arguments?.getString("ingredients")?.split(",") ?: emptyList(),
-                        steps = backStackEntry.arguments?.getString("steps")?.split(",") ?: emptyList()
+                        steps = backStackEntry.arguments?.getString("steps")?.split(",") ?: emptyList(),
+                        onBack = { finish() }, // Revenir en arrière
                     )
                 }
             }
@@ -146,7 +146,7 @@ fun RecipesScreen(
         }
     }
 
-    // Récupération des recettes depuis Firestore
+    // retrieve recipes from Firestore
     LaunchedEffect(filterType, filterValue) {
         val query = when (filterType) {
             "category" -> firestore.collection("recipes").whereEqualTo("category", filterValue)
@@ -170,11 +170,11 @@ fun RecipesScreen(
                         imageUrl = doc.getString("imageUrl") ?: "",
                         meal = doc.getString("meal") ?: "",
                         preparationTime = doc.getString("preparation_time") ?: "",
-                        ingredients = emptyList(), // On chargera les ingrédients après
+                        ingredients = emptyList(),
                         steps = doc.get("steps") as? List<String> ?: emptyList()
                     )
 
-                    // Charger les données des ingrédients
+                    // load ingredient data
                     val ingredientNames = mutableListOf<String>()
                     val ingredientTasks = ingredientsReferences.map { ref ->
                         ref.get().addOnSuccessListener { ingredientDoc ->
@@ -182,7 +182,7 @@ fun RecipesScreen(
                         }
                     }
 
-                    // Attendre que tous les ingrédients soient chargés
+                    // wait until all ingredients are loaded
                     Tasks.whenAllSuccess<Void>(ingredientTasks).addOnCompleteListener {
                         recipe.ingredients = ingredientNames
                         fetchedRecipes.add(recipe)
@@ -208,7 +208,7 @@ fun RecipesScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // En-tête
+            // header
             HeaderForRecipesScreen(
                 username = currentUsername,
                 profileImageUrl = currentProfileImageUrl,
@@ -217,85 +217,63 @@ fun RecipesScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            when {
-                isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = Color.White)
-                    }
-                }
-                errorMessage != null -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = errorMessage ?: "An error occurred.",
-                            color = Color.White
-                        )
-                    }
-                }
-                else -> {
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Text(
-                            text = "$filterType: $filterValue",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
+            Text(
+                text = "$filterType: $filterValue",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
 
-                        LazyColumn(
-                            modifier = Modifier
-                                .weight(1f) // Assure que la liste occupe tout l'espace restant
-                                .padding(horizontal = 16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            contentPadding = PaddingValues(bottom = 16.dp) // espace avant le bouton
-                        ) {
-                            items(recipes) { recipe ->
-                                RecipeCard(recipe = recipe, onClick = onRecipeClick)
-                            }
-                        }
-
-                        Button(
-                            onClick = onBack,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .height(48.dp), // Taille du bouton
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFE48E8E)),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement  = Arrangement.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_previous),
-                                    contentDescription = "Back",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(24.dp)
-                                )
-
-                                Spacer(modifier = Modifier.width(8.dp))
-
-                                Text(
-                                    text = "Back",
-                                    color = Color(0xFF7F3C3C),
-                                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                )
-
-
-                            }
-                        }
-                        Spacer(modifier = Modifier.width(64.dp))
-                    }
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 80.dp)
+            ) {
+                items(recipes) { recipe ->
+                    RecipeCard(recipe = recipe, onClick = onRecipeClick)
                 }
             }
+        }
+
+        // separate status management (loading/error)
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color.White)
+            }
+        } else if (errorMessage != null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = errorMessage ?: "An error occurred.",
+                    color = Color.White
+                )
+            }
+        }
+
+        // floating button
+        FloatingActionButton(
+            onClick = onBack,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .offset(y = (-32).dp)
+                .padding(end = 16.dp, bottom = 32.dp),
+            backgroundColor = Color(0xFFE48E8E),
+            shape = CircleShape
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_previous),
+                contentDescription = "Back",
+                tint = Color.Unspecified,
+                modifier = Modifier.size(32.dp)
+            )
         }
     }
 }
@@ -323,7 +301,7 @@ fun RecipeCard(recipe: Recipe, onClick: (Recipe) -> Unit) {
     }
 }
 
-// Recipe data class
+// recipe data class
 data class Recipe(
     val name: String,
     val category: String,
@@ -335,41 +313,6 @@ data class Recipe(
     var ingredients: List<String>,
     val steps: List<String>
 )
-
-@Composable
-fun FloatingBackButton(onBack: () -> Unit, modifier: Modifier = Modifier) {
-    FloatingActionButton(
-        onClick = onBack,
-        backgroundColor = Color.White,
-        modifier = Modifier.size(48.dp) // Taille réduite du bouton
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_previous),
-            contentDescription = "Back",
-            tint = Color(0xFF7F3C3C),
-            modifier = Modifier.size(24.dp) // Taille de l'icône ajustée
-        )
-    }
-    /*Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.BottomStart
-    ) {
-        FloatingActionButton(
-            onClick = onBack,
-            backgroundColor = Color.White,
-            modifier = Modifier.size(48.dp) // Taille réduite du bouton
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_previous),
-                contentDescription = "Back",
-                tint = Color(0xFF7F3C3C),
-                modifier = Modifier.size(24.dp) // Taille de l'icône ajustée
-            )
-        }
-    }*/
-}
 
 @Composable
 fun HeaderForRecipesScreen(

@@ -46,7 +46,8 @@ class RecipeDetailsActivity : ComponentActivity() {
                 difficulty = difficulty,
                 calories = calories,
                 ingredients = ingredients,
-                steps = steps
+                steps = steps,
+                onBack = { finish() }
             )
         }
     }
@@ -62,23 +63,24 @@ fun RecipeDetailsScreen(
     difficulty: String,
     calories: String,
     ingredients: List<String>,
-    steps: List<String>
+    steps: List<String>,
+    onBack: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color(0xFF7F3C3C)
+        color = Color(0xFFE2D9D9)
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
             item {
-                // Image et bouton de retour
+                // image and back button
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(300.dp)
                 ) {
-                    // Image principale
+                    // principal image
                     AsyncImage(
                         model = imageUrl,
                         contentDescription = name,
@@ -86,55 +88,54 @@ fun RecipeDetailsScreen(
                         contentScale = ContentScale.Crop
                     )
 
-                    // Bouton de retour
+                    // back button
                     IconButton(
-                        onClick = { /* Handle back navigation */ },
+                        onClick = onBack,
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(64.dp)
                             .align(Alignment.TopStart)
-                            .padding(16.dp)
+                            .offset(x = 20.dp, y = 30.dp)
                             .clip(CircleShape)
-                            .background(Color.White)
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_previous),
                             contentDescription = "Back",
-                            tint = Color(0xFF7F3C3C)
+                            tint = Color.White
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Titre de la recette
+                // recipe title
                 Text(
                     text = name,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = Color(0xFF4A4A4A),
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Détails de la recette
+                // recipe details
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Text(
                         text = "Category: $category",
                         fontSize = 16.sp,
-                        color = Color.LightGray,
+                        color = Color(0xFF737373),
                         modifier = Modifier.padding(vertical = 4.dp)
                     )
                     Text(
                         text = "Meal: $meal",
                         fontSize = 16.sp,
-                        color = Color.LightGray
+                        color = Color(0xFF737373)
                     )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Informations sur la recette
+                // recipe information
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -148,20 +149,20 @@ fun RecipeDetailsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Ingrédients
+                // ingredients
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Text(
                         text = "Ingredients",
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
-                        color = Color.White,
+                        color = Color(0xFF4A4A4A),
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                     ingredients.forEach { ingredient ->
                         Text(
                             text = "• $ingredient",
                             fontSize = 16.sp,
-                            color = Color.LightGray,
+                            color = Color(0xFF737373),
                             modifier = Modifier.padding(vertical = 2.dp)
                         )
                     }
@@ -169,20 +170,20 @@ fun RecipeDetailsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Étapes
+                // steps
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Text(
                         text = "Steps:",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        color = Color(0xFF4A4A4A),
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                     steps.forEachIndexed { index, step ->
                         Text(
                             text = "${index + 1}. $step",
                             fontSize = 16.sp,
-                            color = Color.LightGray,
+                            color = Color(0xFF737373),
                             modifier = Modifier.padding(vertical = 2.dp)
                         )
                     }
@@ -203,12 +204,13 @@ fun RecipeInfoItem(icon: Int, label: String) {
             painter = painterResource(id = icon),
             contentDescription = label,
             modifier = Modifier.size(24.dp),
-            tint = Color.White
+            tint = Color.Unspecified
         )
         Text(
+            fontWeight = FontWeight.Bold,
             text = label,
             fontSize = 14.sp,
-            color = Color.White
+            color = Color(0xFF4A4A4A)
         )
     }
 }

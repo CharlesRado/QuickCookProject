@@ -34,7 +34,7 @@ fun CookingTimerScreen(
     var timeInMillis by remember { mutableStateOf(0L) }
     var username by remember { mutableStateOf("User") }
     var profileImageUrl by remember { mutableStateOf("") }
-
+    val currentUser = FirebaseAuth.getInstance().currentUser
     // continue button
     var showContinueButton by remember { mutableStateOf(false) }
 
@@ -105,38 +105,41 @@ fun CookingTimerScreen(
                 // Finish Cooking button
                 FloatingActionButton(
                     onClick = {
-                        firestore.collection("recipes").whereEqualTo("recipeName", recipeName)
-                            .get()
-                            .addOnSuccessListener { result ->
-                                val ingredients = result.documents.firstOrNull()?.let { doc ->
-                                    (1..4).mapNotNull { doc.getString("ingredient$it") }
-                                } ?: emptyList()
+                        if (currentUser != null) {
+                            firestore.collection("recipes").whereEqualTo("recipeName", recipeName)
+                                .get()
+                                .addOnSuccessListener { result ->
+                                    val ingredients = result.documents.firstOrNull()?.let { doc ->
+                                        (1..4).mapNotNull { doc.getString("ingredient$it") }
+                                    } ?: emptyList()
 
-                                firestore.collection("completed_recipes").add(
-                                    mapOf(
-                                        "recipeName" to recipeName,
-                                        "timeTaken" to formatTime(timeInMillis),
-                                        "ingredients" to ingredients,
-                                        "steps" to steps
-                                    )
-                                ).addOnSuccessListener {
-                                    // send local notification
-                                    val notificationData = mapOf(
-                                        "title" to "Recipe Completed!",
-                                        "message" to "You finished $recipeName.",
-                                        "timestamp" to System.currentTimeMillis(),
-                                        "isRead" to false
-                                    )
+                                    firestore.collection("completed_recipes").add(
+                                        mapOf(
+                                            "recipeName" to recipeName,
+                                            "timeTaken" to formatTime(timeInMillis),
+                                            "ingredients" to ingredients,
+                                            "steps" to steps,
+                                            "userId" to currentUser.uid
+                                        )
+                                    ).addOnSuccessListener {
+                                        // send local notification
+                                        val notificationData = mapOf(
+                                            "title" to "Recipe Completed!",
+                                            "message" to "You finished $recipeName.",
+                                            "timestamp" to System.currentTimeMillis(),
+                                            "isRead" to false
+                                        )
 
-                                    val userId = FirebaseAuth.getInstance().currentUser?.uid
-                                    if (userId != null) {
-                                        firestore.collection("users").document(userId)
-                                            .collection("notifications").add(notificationData)
+                                        val userId = FirebaseAuth.getInstance().currentUser?.uid
+                                        if (userId != null) {
+                                            firestore.collection("users").document(userId)
+                                                .collection("notifications").add(notificationData)
+                                        }
+
+                                        navController.popBackStack()
                                     }
-
-                                    navController.popBackStack()
                                 }
-                            }
+                        }
                     },
                     backgroundColor = Color(0xFF7F3C3C),
                     shape = RoundedCornerShape(23.dp)

@@ -39,6 +39,7 @@ fun ProfileScreen(onNavigateTo: (String) -> Unit) {
     var email by remember { mutableStateOf("Loading...") }
     var totalTimeConnected by remember { mutableStateOf("Loading...") }
     var profileImageUrl by remember { mutableStateOf("") }
+    var completedRecipesCount by remember { mutableStateOf(0) }
     var isEditingUsername by remember { mutableStateOf(false) } // indicator to activate or disactivate editing mode for username
     var newUsername by remember { mutableStateOf("") } // new username filled
     var isEditingEmail by remember { mutableStateOf(false) } // indicator to activate or disactivate editing mode for email
@@ -72,9 +73,6 @@ fun ProfileScreen(onNavigateTo: (String) -> Unit) {
                     // retrieve and format the total connection time
                     val totalTime = document.getLong("totalTime") ?: 0L
                     totalTimeConnected = formatTime(totalTime)
-
-                    println("DEBUG: Username retrieved: $username")
-                    println("DEBUG: Total time connected: $totalTimeConnected")
                 }
                 .addOnFailureListener { exception ->
                     println("DEBUG: Failed to retrieve data: ${exception.message}")
@@ -83,14 +81,18 @@ fun ProfileScreen(onNavigateTo: (String) -> Unit) {
             // store the connection timestamp into Firestore
             firestore.collection("users").document(user.uid)
                 .update("loginTimestamp", loginTimestamp)
-                .addOnSuccessListener {
-                    println("DEBUG: Login timestamp set successfully.")
+
+
+            firestore.collection("completed_recipes")
+                .whereEqualTo("userId", user.uid) // Vérifier que le champ userId existe dans Firestore
+                .addSnapshotListener { documents, error ->
+                    if (error != null) {
+                        println("DEBUG: Failed to get completed recipes count: ${error.message}")
+                        return@addSnapshotListener
+                    }
+                    completedRecipesCount = documents?.size() ?: 0
+                    println("DEBUG: Completed recipes count updated: $completedRecipesCount")
                 }
-                .addOnFailureListener { e ->
-                    println("DEBUG: Failed to set login timestamp: ${e.message}")
-                }
-        } else {
-            println("DEBUG: No authenticated user found.")
         }
     }
 
@@ -176,7 +178,7 @@ fun ProfileScreen(onNavigateTo: (String) -> Unit) {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 StatItem(totalTimeConnected, "Total time", R.drawable.ic_waste)
-                StatItem("3", "Done", R.drawable.ic_recipe)
+                StatItem(completedRecipesCount.toString(), "Done", R.drawable.ic_recipe)
                 StatItem("4", "Favorites", R.drawable.ic_difficulty)
             }
 

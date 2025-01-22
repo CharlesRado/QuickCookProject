@@ -1,0 +1,242 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam dpi 150
+skinparam nodesep 20
+skinparam ranksep 300
+
+package authentications {
+
+    class EmailService {
+        - API_KEY : String
+        - SENDER_EMAIL : String
+        - SENDGRID_URL : String
+        - client : OkHttpClient
+        + sendVerificationCode(email: String, code: String): Boolean
+    }
+
+    class ForgotPasswordActivity {
+        - auth : FirebaseAuth
+        - firestore : FirebaseFirestore
+        - generatedCode : String?
+        + onCreate(savedInstanceState: Bundle): void
+        + ForgotPasswordScreen(): void
+        - updatePassword(email: String, newPassword: String, onComplete: () -> Unit): void
+    }
+
+    class LoginActivity {
+        - auth : FirebaseAuth
+        - googleSignInClient : GoogleSignInClient
+        - firestore : FirebaseFirestore
+        + onCreate(savedInstanceState: Bundle): void
+        - signInWithGoogle(): void
+        - firebaseAuthWithGoogle(idToken: String?): void
+    }
+
+    class SigninActivity {
+        - auth : FirebaseAuth
+        - googleSignInClient : GoogleSignInClient
+        - firestore : FirebaseFirestore
+        + onCreate(savedInstanceState: Bundle): void
+        - createUser(email: String, password: String, username: String): void
+        - signInWithGoogle(): void
+        - firebaseAuthWithGoogle(idToken: String?): void
+    }
+
+    class FirebaseAuth {
+    }
+
+    class FirebaseFirestore {
+    }
+
+    class GoogleSignInClient {
+    }
+
+    class GoogleAuthProvider {
+    }
+
+    EmailService --> ForgotPasswordActivity : "Used to send verification code"
+    FirebaseAuth <-- ForgotPasswordActivity : "Used for authentication"
+    FirebaseFirestore <-- ForgotPasswordActivity : "Stores user data"
+
+    LoginActivity --> FirebaseAuth : "Handles user authentication"
+    LoginActivity --> FirebaseFirestore : "Fetches user data"
+    LoginActivity --> GoogleSignInClient : "Google Sign-In"
+
+    SigninActivity --> FirebaseAuth : "Handles user registration"
+    SigninActivity --> FirebaseFirestore : "Stores user information"
+    SigninActivity --> GoogleSignInClient : "Google Sign-Up"
+    SigninActivity --> GoogleAuthProvider : "Google authentication provider"
+}
+
+package components {
+    class BottomNavigationBar {
+        + BottomNavigationBar(navController: NavHostController): void
+    }
+
+    class NavHostController {
+    }
+
+    BottomNavigationBar --> NavHostController : "Manages navigation"
+}
+
+package navigation {
+    class AppNavigationActivity {
+        + AppNavigationActivity(navController: NavHostController): void
+    }
+
+    class NavHostController {
+    }
+
+    class NavHost {
+    }
+
+    class NavGraph {
+    }
+
+    class HomeScreen {
+    }
+
+    class RecipesScreen {
+    }
+
+    class RecipeDetailsScreen {
+    }
+
+    class ProfileScreen {
+    }
+
+    class NotificationsScreen {
+    }
+
+    class StatisticsScreen {
+    }
+
+    class IngredientsScreen {
+    }
+
+    class CookingScreen {
+    }
+
+    class CookingTimerScreen {
+    }
+
+    AppNavigationActivity --> NavHostController : "Handles navigation"
+    AppNavigationActivity --> NavHost : "Contains navigation graph"
+    AppNavigationActivity --> HomeScreen : "Navigates to"
+    AppNavigationActivity --> RecipesScreen : "Navigates to"
+    AppNavigationActivity --> RecipeDetailsScreen : "Navigates to"
+    AppNavigationActivity --> ProfileScreen : "Navigates to"
+    AppNavigationActivity --> NotificationsScreen : "Navigates to"
+    AppNavigationActivity --> StatisticsScreen : "Navigates to"
+    AppNavigationActivity --> IngredientsScreen : "Navigates to"
+    AppNavigationActivity --> CookingScreen : "Navigates to"
+    AppNavigationActivity --> CookingTimerScreen : "Navigates to"
+}
+
+package notifications {
+    class MessagingService {
+        + onMessageReceived(remoteMessage: RemoteMessage): void
+        - saveNotificationToFirestore(title: String, message: String): void
+        - showNotification(title: String, message: String): void
+    }
+
+    class NotificationsScreen {
+        + NotificationsScreen(navController: NavController): void
+    }
+
+    class RemoteMessage {
+    }
+
+    MessagingService --> FirebaseFirestore : "Stores notifications"
+    MessagingService --> FirebaseAuth : "Retrieves user ID"
+    MessagingService --> RemoteMessage : "Handles incoming messages"
+}
+
+package screens {
+    class CookingActivity {
+        + onCreate(savedInstanceState: Bundle): void
+    }
+
+    class CookingScreen {
+        + CookingScreen(navController: NavController, selectedIngredients: List<String>, onBack: () -> Unit): void
+    }
+
+    class CookingTimerScreen {
+        + CookingTimerScreen(navController: NavController, recipeName: String, preparationTime: String, steps: List<String>): void
+    }
+
+    class HomeScreen {
+        + HomeScreen(onCategorySelected: (String) -> Unit, onMealSelected: (String) -> Unit, onNavigateToProfile: () -> Unit, navController: NavController): void
+    }
+
+    class IngredientsActivity {
+        + onCreate(savedInstanceState: Bundle): void
+    }
+
+    class IngredientsScreen {
+        + IngredientsScreen(navController: NavController, onNavigateToProfile: () -> Unit): void
+    }
+
+    class MainActivity {
+        + onCreate(savedInstanceState: Bundle): void
+    }
+
+    class ProfileScreen {
+        + ProfileScreen(onNavigateTo: (String) -> Unit): void
+    }
+
+    class RecipeDetailsActivity {
+        + onCreate(savedInstanceState: Bundle): void
+    }
+
+    class RecipeDetailsScreen {
+        + RecipeDetailsScreen(name: String, category: String, meal: String, imageUrl: String, preparationTime: String, difficulty: String, calories: String, ingredients: List<String>, steps: List<String>, onBack: () -> Unit): void
+    }
+
+    class RecipesActivity {
+        + onCreate(savedInstanceState: Bundle): void
+    }
+
+    class RecipesScreen {
+        + RecipesScreen(filterType: String, filterValue: String, username: String, profileImageUrl: String, navController: NavController, onNavigateToProfile: () -> Unit, onBack: () -> Unit, onRecipeClick: (Recipe) -> Unit): void
+    }
+
+    class StatisticsScreen {
+        + StatisticsScreen(): void
+    }
+
+    CookingActivity --> CookingScreen : "Displays Cooking Screen"
+    CookingScreen --> CookingTimerScreen : "Starts Cooking Timer"
+
+    HomeScreen --> ProfileScreen : "Navigates to"
+    HomeScreen --> IngredientsScreen : "Navigates to"
+
+    IngredientsActivity --> IngredientsScreen : "Displays Ingredients"
+    IngredientsScreen --> CookingScreen : "Navigates to"
+
+    MainActivity --> AppNavigationActivity : "Handles Navigation"
+    MainActivity --> BottomNavigationBar : "Displays Bottom Navigation"
+
+    ProfileScreen --> RecipeDetailsScreen : "Shows user recipes"
+    ProfileScreen --> StatisticsScreen : "Shows user stats"
+
+    RecipeDetailsActivity --> RecipeDetailsScreen : "Displays Recipe Details"
+    RecipesActivity --> RecipesScreen : "Displays Recipes List"
+    RecipesScreen --> RecipeDetailsScreen : "Navigates to"
+
+    StatisticsScreen --> ProfileScreen : "User Statistics"
+}
+
+package welcome {
+    class HomeActivity {
+        + onCreate(savedInstanceState: Bundle): void
+    }
+
+    class HomeScreen {
+        + HomeScreen(): void
+    }
+
+    HomeActivity --> HomeScreen : "Displays Welcome Screen"
+    HomeScreen --> LoginActivity : "Navigates to Login"
+}
+@enduml

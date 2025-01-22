@@ -89,6 +89,10 @@ dependencies {
     implementation(libs.sendgrid.sendgrid.java){
         exclude(group = "org.apache.httpcomponents", module = "httpclient")
     }
+
+    /* Messaging */
+    implementation(libs.firebase.messaging.ktx)
+
     // Ajoute une version compatible d'Apache HttpClient
     implementation(libs.httpclient)
     implementation(libs.httpcore)

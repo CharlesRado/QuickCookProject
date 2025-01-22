@@ -41,7 +41,7 @@ class HomeActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun HomeScreen() {
-    val context = LocalContext.current // Pour rediriger vers une autre activité
+    val context = LocalContext.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -52,17 +52,16 @@ fun HomeScreen() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Logo (Assure-toi d'avoir un logo dans le dossier drawable avec le nom "ic_logo")
             Image(
-                painter = painterResource(id = R.drawable.ic_quickcook_logo), // Remplace avec le nom réel de ton logo
+                painter = painterResource(id = R.drawable.ic_quickcook_logo),
                 contentDescription = "Logo",
                 modifier = Modifier
-                    .size(300.dp) // Taille du logo
+                    .size(300.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Bouton Get Started
+            // Get Started button
             Button(
                 onClick = {
                     val intent = Intent(context, LoginActivity::class.java)
@@ -71,12 +70,12 @@ fun HomeScreen() {
                 modifier = Modifier
                     .width(200.dp)
                     .height(48.dp),
-                shape = RoundedCornerShape(24.dp), // Boutons arrondis
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF7F3C3C)) // Couleur du bouton : #7F3C3C
+                shape = RoundedCornerShape(24.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF7F3C3C))
             ) {
                 Text(
                     text = "Get started !",
-                    color = Color.White, // Texte en blanc
+                    color = Color.White,
                     style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
                     textAlign = TextAlign.Center
                 )

@@ -5,7 +5,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.quickcook_project.notifications.NotificationsScreen
+import com.example.quickcook_project.screens.CookingScreen
+import com.example.quickcook_project.screens.CookingTimerScreen
 import com.example.quickcook_project.screens.HomeScreen
+import com.example.quickcook_project.screens.IngredientsScreen
 import com.example.quickcook_project.screens.ProfileScreen
 import com.example.quickcook_project.screens.RecipeDetailsScreen
 import com.example.quickcook_project.screens.RecipesScreen
@@ -32,7 +36,8 @@ fun AppNavigationActivity(navController: NavHostController) {
                 onNavigateToProfile = {
                     // navigate to profile page
                     navController.navigate("profile")
-                }
+                },
+                navController = navController
             )
         }
 
@@ -52,7 +57,7 @@ fun AppNavigationActivity(navController: NavHostController) {
                 onBack = {
                     navController.popBackStack()
                 },
-                
+                navController = navController,
                 onRecipeClick = { selectedRecipe ->
                     val encodedIngredients = encodeForNavigation(selectedRecipe.ingredients.joinToString(";"))
                     val encodedSteps = encodeForNavigation(selectedRecipe.steps.joinToString(";"))
@@ -87,6 +92,7 @@ fun AppNavigationActivity(navController: NavHostController) {
                 onBack = {
                     navController.popBackStack()
                 },
+                navController = navController,
                 onRecipeClick = { selectedRecipe ->
                     val encodedIngredients = encodeForNavigation(selectedRecipe.ingredients.joinToString(";"))
                     val encodedSteps = encodeForNavigation(selectedRecipe.steps.joinToString(";"))
@@ -144,35 +150,35 @@ fun AppNavigationActivity(navController: NavHostController) {
             )
         }
 
+        // Notifications Screen
+        composable("notifications") { NotificationsScreen(navController) }
+
         // Statistics Screen
         composable("stats") {
             StatisticsScreen()
         }
 
-        // Edit Profile Name Screen
-        /*composable("edit_profile_name") {
-            // Appel de l'écran pour modifier le nom de profil
-            EditProfileNameScreen()
+        composable("ingredients") {
+            IngredientsScreen(navController = navController, onNavigateToProfile = {
+                navController.navigate("profile")
+            },)
         }
 
-        // Change Email Screen
-        composable("change_email") {
-            ChangeEmailScreen()
+        composable(
+            route = "cooking/{ingredients}",
+            arguments = listOf(navArgument("ingredients") { defaultValue = "" })
+        ) { backStackEntry ->
+            val ingredients = decodeFromNavigation(backStackEntry.arguments?.getString("ingredients") ?: "").split(",")
+            CookingScreen(navController = navController, selectedIngredients = ingredients, onBack = { navController.popBackStack() })
         }
 
-        // Change Password Screen
-        composable("change_password") {
-            ChangePasswordScreen()
-        }
+        composable("cooking_timer/{name}/{preparationTime}/{steps}") { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name") ?: "Unknown"
+            val preparationTime = backStackEntry.arguments?.getString("preparationTime") ?: "0"
+            val steps = backStackEntry.arguments?.getString("steps")?.split(";") ?: emptyList()
 
-        // Settings Screen
-        composable("settings") {
-            SettingsScreen()
+            CookingTimerScreen(navController = navController, recipeName = name, preparationTime = preparationTime, steps = steps)
         }
-
-        composable("stats") {
-            StatisticsScreen()
-        }*/
     }
 }
 

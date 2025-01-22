@@ -99,7 +99,7 @@ class LoginActivity : ComponentActivity() {
                         firestore.collection("users").document(userId).get()
                             .addOnSuccessListener { document ->
                                 if (!document.exists()) {
-                                    // Ajouter l'utilisateur dans Firestore s'il n'existe pas
+                                    // add user into firestore if doesn't exist
                                     val userData = mapOf(
                                         "username" to (user.displayName ?: "Google User"),
                                         "email" to user.email
@@ -157,7 +157,7 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
 
     val firestore = FirebaseFirestore.getInstance()
-    val context = LocalContext.current // récupération du context dans compose
+    val context = LocalContext.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -243,7 +243,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Login button
+            // login button
             Button(
                 onClick = {
                     // user verification into firebase authentication
@@ -262,7 +262,7 @@ fun LoginScreen(
                                                     "Welcome back, $username!",
                                                     Toast.LENGTH_SHORT
                                                 ).show()
-                                                // Rediriger vers MainActivity
+                                                // redirect to MainActivity
                                                 val intent = Intent(context, MainActivity::class.java)
                                                 context.startActivity(intent)
                                             } else {
@@ -296,7 +296,7 @@ fun LoginScreen(
                 Text(text = "Log In", color = Color.White)
             }
 
-            // Sign Up link
+            // sign Up link
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Don't have an account? Sign Up",
@@ -309,7 +309,7 @@ fun LoginScreen(
                 }
             )
 
-            // Google Sign-In Button
+            // google Sign-In Button
             Spacer(modifier = Modifier.height(32.dp))
 
             Row(
@@ -322,7 +322,7 @@ fun LoginScreen(
                         .size(72.dp)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_google_logo), // Assure-toi d'ajouter ce logo dans `res/drawable`
+                        painter = painterResource(id = R.drawable.ic_google_logo),
                         contentDescription = "Google Log-In",
                         tint = Color.Unspecified
                     )

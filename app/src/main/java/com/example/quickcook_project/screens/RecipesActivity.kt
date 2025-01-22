@@ -25,6 +25,7 @@ import com.example.quickcook_project.R
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.foundation.background
 import androidx.compose.ui.draw.clip
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -58,9 +59,10 @@ class RecipesActivity : ComponentActivity() {
                         username = username,
                         profileImageUrl = profileImageUrl,
                         onNavigateToProfile = {
-                            navController.navigate("profile") // Naviguer vers le profil
+                            navController.navigate("profile")
                         },
-                        onBack = { finish() }, // Revenir en arrière
+                        onBack = { finish() },
+                        navController = navController,
                         onRecipeClick = { selectedRecipe ->
                             val ingredients = selectedRecipe.ingredients.joinToString(";")
                             val steps = selectedRecipe.steps.joinToString(";")
@@ -106,7 +108,7 @@ class RecipesActivity : ComponentActivity() {
                         calories = backStackEntry.arguments?.getString("calories") ?: "0",
                         ingredients = backStackEntry.arguments?.getString("ingredients")?.split(",") ?: emptyList(),
                         steps = backStackEntry.arguments?.getString("steps")?.split(",") ?: emptyList(),
-                        onBack = { finish() }, // Revenir en arrière
+                        onBack = { finish() },
                     )
                 }
             }
@@ -120,6 +122,7 @@ fun RecipesScreen(
     filterValue: String,
     username: String,
     profileImageUrl: String,
+    navController: NavController,
     onNavigateToProfile: () -> Unit,
     onBack: () -> Unit,
     onRecipeClick: (Recipe) -> Unit
@@ -208,12 +211,12 @@ fun RecipesScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+            Spacer(modifier = Modifier.height(32.dp))
+
             // header
-            HeaderForRecipesScreen(
-                username = currentUsername,
-                profileImageUrl = currentProfileImageUrl,
-                onNavigateToProfile = onNavigateToProfile
-            )
+            HeaderForIngredientsScreen(username, profileImageUrl, navController, {
+                navController.navigate("profile")
+            })
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -313,58 +316,3 @@ data class Recipe(
     var ingredients: List<String>,
     val steps: List<String>
 )
-
-@Composable
-fun HeaderForRecipesScreen(
-    username: String,
-    profileImageUrl: String,
-    onNavigateToProfile: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(28.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Card(
-                shape = CircleShape,
-                modifier = Modifier
-                    .size(50.dp)
-                    .clickable {
-                        onNavigateToProfile()
-                    }
-            ) {
-                if (profileImageUrl.isNotEmpty()) {
-                    AsyncImage(
-                        model = profileImageUrl,
-                        contentDescription = "Profile Picture",
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_profile_dark),
-                        contentDescription = "Default Profile Picture",
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Hey ! $username",
-                style = TextStyle(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            )
-        }
-        Icon(
-            painter = painterResource(id = R.drawable.ic_notification),
-            contentDescription = "Notification",
-            modifier = Modifier.size(30.dp),
-            tint = Color.White
-        )
-    }
-}

@@ -202,11 +202,11 @@ fun ProfileScreen(onNavigateTo: (String) -> Unit) {
                             colors = TextFieldDefaults.textFieldColors(
                                 textColor = Color.Black,
                                 backgroundColor = Color(0xFFF1F1F1),
-                                focusedIndicatorColor = Color(0xFF7F3C3C), // Ligne d'indicateur rouge quand activée
-                                unfocusedIndicatorColor = Color(0xFFDADADA), // Ligne d'indicateur gris quand inactive
-                                cursorColor = Color(0xFF7F3C3C), // Curseur rouge
-                                focusedLabelColor = Color.Gray, // Label gris lorsqu'il est focalisé
-                                unfocusedLabelColor = Color.Gray // Label gris lorsqu'il n'est pas focalisé
+                                focusedIndicatorColor = Color(0xFF7F3C3C),
+                                unfocusedIndicatorColor = Color(0xFFDADADA),
+                                cursorColor = Color(0xFF7F3C3C),
+                                focusedLabelColor = Color.Gray,
+                                unfocusedLabelColor = Color.Gray
                             ),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -231,8 +231,8 @@ fun ProfileScreen(onNavigateTo: (String) -> Unit) {
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(50.dp), // Ajout de hauteur pour un design uniforme
-                            shape = RoundedCornerShape(24.dp), // Ajout de bords arrondis
+                                .height(50.dp),
+                            shape = RoundedCornerShape(24.dp),
                             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF7F3C3C))
                         ) {
                             Text(
@@ -251,7 +251,7 @@ fun ProfileScreen(onNavigateTo: (String) -> Unit) {
                 label = if (isEditingUsername) "Cancel Editing" else "Edit Profile Name",
                 iconRes = R.drawable.ic_edit,
                 onNavigateTo = {
-                    isEditingUsername = !isEditingUsername // Active/désactive le mode édition
+                    isEditingUsername = !isEditingUsername
                 },
                 destination = ""
             )
@@ -259,7 +259,7 @@ fun ProfileScreen(onNavigateTo: (String) -> Unit) {
                 label = "Change email",
                 iconRes = R.drawable.ic_mail,
                 onNavigateTo = {
-                    isEditingEmail = !isEditingEmail // Active/désactive le mode édition
+                    isEditingEmail = !isEditingEmail
                 },
                 destination = ""
             )
@@ -302,15 +302,15 @@ fun ProfileScreen(onNavigateTo: (String) -> Unit) {
                                     firestore = firestore,
                                     newEmail = newEmail,
                                     onUpdateSuccess = {
-                                        email = newEmail // Mettre à jour uniquement en haut
-                                        isEditingEmail = false // Fermer le mode édition
+                                        email = newEmail
+                                        isEditingEmail = false
                                         Toast.makeText(context, "Email update successfully.", Toast.LENGTH_LONG).show()
                                         // println("Email updated successfully.")
                                     },
                                     onUpdateFail = { error ->
                                         println(error)
                                         if (error.contains("verify")) {
-                                            // Montrez un message toast ou un snackbar
+
                                             Toast.makeText(context, "Please verify your email before updating.", Toast.LENGTH_LONG).show()
                                         } else {
                                             Toast.makeText(context, "Failed to update email: $error", Toast.LENGTH_LONG).show()
@@ -340,7 +340,7 @@ fun ProfileScreen(onNavigateTo: (String) -> Unit) {
                 iconRes = R.drawable.ic_logout,
                 onNavigateTo = {
                     onLogout(auth, firestore) {
-                        onNavigateTo("login") // Naviguer vers la page de connexion après déconnexion
+                        onNavigateTo("login")
                     }
                 },
                 destination = "",

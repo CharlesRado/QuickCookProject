@@ -32,7 +32,7 @@ class ForgotPasswordActivity : ComponentActivity() {
 
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
-    private var generatedCode: String? = null // Stockage temporaire du code de vérification
+    private var generatedCode: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +50,7 @@ class ForgotPasswordActivity : ComponentActivity() {
         var newPassword by remember { mutableStateOf("") }
         var confirmPassword by remember { mutableStateOf("") }
 
-        var step by remember { mutableStateOf(1) } // Contrôle des étapes
+        var step by remember { mutableStateOf(1) }
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -72,7 +72,7 @@ class ForgotPasswordActivity : ComponentActivity() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Étape 1 : Demander l'email
+                // step 1 : ask for the email
                 if (step == 1) {
                     CustomInputField(
                         label = "Email",
@@ -84,20 +84,20 @@ class ForgotPasswordActivity : ComponentActivity() {
 
                     CustomButton("Confirm") {
                         if (email.isNotEmpty()) {
-                            val verificationCode = (100000..999999).random().toString() // Génère un code aléatoire
+                            val verificationCode = (100000..999999).random().toString() // generate a random code
                             generatedCode = verificationCode
 
-                            // Debugging : Log pour vérifier l'état du code
+                            // Debugging : Log to verify the state of the code
                             println("Generated Code: $generatedCode")
 
-                            // Envoyer le code par email
+                            // send the code by email
                             CoroutineScope(Dispatchers.IO).launch {
                                 val emailSent =
                                     EmailService.sendVerificationCode(email, verificationCode)
                                 withContext(Dispatchers.Main) {
                                     if (emailSent) {
                                         Toast.makeText(context, "Code sent to $email", Toast.LENGTH_SHORT).show()
-                                        step = 2 // Passe à l'étape 2 seulement si l'email est envoyé
+                                        step = 2
                                     } else {
                                         Toast.makeText(context, "Failed to send code. Try again.", Toast.LENGTH_SHORT).show()
                                     }
@@ -113,7 +113,7 @@ class ForgotPasswordActivity : ComponentActivity() {
                     ReturnToLogin()
                 }
 
-                // Étape 2 : Vérifier le code
+                // step 2 : code verification
                 if (step == 2) {
                     CustomInputField(
                         label = "Code",
@@ -136,7 +136,7 @@ class ForgotPasswordActivity : ComponentActivity() {
                     ReturnToLogin()
                 }
 
-                // Étape 3 : Changer le mot de passe
+                // step 3 : change password
                 if (step == 3) {
                     CustomInputField(
                         label = "New Password",
@@ -234,7 +234,7 @@ class ForgotPasswordActivity : ComponentActivity() {
         }
     }
 
-    // Mettre à jour le mot de passe
+    // update password
     private fun updatePassword(email: String, newPassword: String, onComplete: () -> Unit) {
         firestore.collection("users").whereEqualTo("email", email).get()
             .addOnSuccessListener { documents ->

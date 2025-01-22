@@ -2,7 +2,7 @@
 A smart cooking assistant that helps users find, save, and cook delicious recipes based on their available ingredients.
 It is a Mobile Application to discover new recipes based on ingredients.
 
-I. Project Overview
+## I. Project Overview
 
 QuickCook is an Android mobile application designed to help users discover recipes based on the ingredients they have. It provides an intuitive interface for browsing, selecting, and following recipes while also integrating features such as authentication, notifications, and user profile management. This project was built using Kotlin, Jetpack Compose, and Firebase, ensuring a modern UI and real-time data management.
 

@@ -11,16 +11,16 @@ import com.google.gson.JsonArray
 
 object EmailService {
 
-    private const val API_KEY = "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" // Clé API SendGrid
-    private const val SENDER_EMAIL = "19carlito09@gmail.com" // Email d'envoi valide
+    private const val API_KEY = "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" // API SendGrid key
+    private const val SENDER_EMAIL = "19carlito09@gmail.com" // good email address to send emails
     private const val SENDGRID_URL = "https://api.sendgrid.com/v3/mail/send"
 
-    private val client = OkHttpClient() // Instancie OkHttpClient
+    private val client = OkHttpClient() // OkHttpClient instanciate
 
 
     fun sendVerificationCode(email: String, code: String): Boolean {
         val jsonBody = JsonObject().apply {
-            // Personalizations array (list of recipients)
+            // personalizations array (list of recipients)
             add("personalizations", JsonArray().apply {
                 add(JsonObject().apply {
                     add("to", JsonArray().apply {
@@ -32,12 +32,12 @@ object EmailService {
                 })
             })
 
-            // From address
+            // from address
             add("from", JsonObject().apply {
                 addProperty("email", SENDER_EMAIL)
             })
 
-            // Content array
+            // content array
             add("content", JsonArray().apply {
                 add(JsonObject().apply {
                     addProperty("type", "text/plain")
@@ -46,11 +46,11 @@ object EmailService {
             })
         }
 
-        // Convert the JSON to RequestBody
+        // convert the JSON to RequestBody
         val mediaType = "application/json".toMediaType()
         val requestBody = jsonBody.toString().toRequestBody(mediaType)
 
-        // Build the HTTP request
+        // build the HTTP request
         val request = Request.Builder()
             .url(SENDGRID_URL)
             .post(requestBody)
@@ -58,7 +58,7 @@ object EmailService {
             .addHeader("Content-Type", "application/json")
             .build()
 
-        // Execute the request
+        // execute the request
         return try {
             client.newCall(request).execute().use { response ->
                 println("SendGrid Response Code: ${response.code}")

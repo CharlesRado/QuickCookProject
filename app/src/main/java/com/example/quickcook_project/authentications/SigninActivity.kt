@@ -165,7 +165,7 @@ fun SignInScreen(
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
-    val context = LocalContext.current //récupération du context dans compose
+    val context = LocalContext.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),

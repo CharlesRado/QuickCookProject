@@ -21,12 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 
 @Composable
 fun HomeScreen(onCategorySelected: (String) -> Unit,
                onMealSelected: (String) -> Unit,
-               onNavigateToProfile: () -> Unit
+               onNavigateToProfile: () -> Unit,
+               navController: NavController
 ) {
 
     val context = LocalContext.current
@@ -55,58 +57,21 @@ fun HomeScreen(onCategorySelected: (String) -> Unit,
         modifier = Modifier.fillMaxSize(),
         color = Color(0xFFE2D9D9)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Section supérieure avec la photo de profil et le message "Hey !"
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(28.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Card(
-                        shape = CircleShape,
-                        modifier = Modifier
-                            .size(50.dp)
-                            .clickable {
-                                onNavigateToProfile()
-                            }
-                    ) {
-                        if (profileImageUrl.isNotEmpty()) {
-                            AsyncImage(
-                                model = profileImageUrl,
-                                contentDescription = "Profile Picture",
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_profile_dark),
-                                contentDescription = "Default Profile Picture",
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Hey ! $username",
-                        style = TextStyle(
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF4A4A4A)
-                        )
-                    )
-                }
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_notification),
-                    contentDescription = "Notification",
-                    modifier = Modifier.size(30.dp)
-                )
-            }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // header
+            HeaderForIngredientsScreen(username, profileImageUrl, navController, {
+                navController.navigate("profile") // Naviguer vers le profil
+            })
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Barre de recherche
+            // search bar
             TextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
@@ -125,7 +90,7 @@ fun HomeScreen(onCategorySelected: (String) -> Unit,
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Section "Choose by categories..."
+            // "Choose by categories..." section
             Text(
                 text = "Choose by categories...",
                 style = TextStyle(
@@ -161,7 +126,7 @@ fun HomeScreen(onCategorySelected: (String) -> Unit,
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Section "Choose by meal..."
+            // "Choose by meal..." section
             Text(
                 text = "Choose by meal...",
                 style = TextStyle(
@@ -197,7 +162,7 @@ fun HomeScreen(onCategorySelected: (String) -> Unit,
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Bouton "Start Cooking !"
+            // "Start Cooking !" button
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -205,8 +170,7 @@ fun HomeScreen(onCategorySelected: (String) -> Unit,
             ) {
                 Button(
                     onClick = {
-                        val intent = Intent(context, CookingActivity::class.java)
-                        context.startActivity(intent)
+                        navController.navigate("ingredients")
                     },
                     modifier = Modifier
                         .width(200.dp)
@@ -270,7 +234,7 @@ fun MealItem(iconRes: Int, label: String, onClick: () -> Unit) {
             style = TextStyle(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF4A4A4A) // Applique la couleur demandée
+                color = Color(0xFF4A4A4A)
             )
         )
     }

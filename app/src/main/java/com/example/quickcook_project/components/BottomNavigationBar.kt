@@ -29,12 +29,12 @@ fun BottomNavigationBar(navController: NavHostController) {
             icon = {
                 Box(
                     modifier = Modifier
-                        .size(40.dp) // Taille de la Box (au cas où)
+                        .size(40.dp)
                         .background(
                             color = if (currentRoute == "profile") Color.White else Color.Transparent,
                             shape = RoundedCornerShape(8.dp)
                         )
-                        .padding(6.dp) // Ajustement du padding interne
+                        .padding(6.dp)
                 ) {
                     Icon(
                         painter = painterResource(
@@ -43,7 +43,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                         ),
                         contentDescription = "Profile",
                         tint = if (currentRoute == "profile") Color(0xFF7F3C3C) else Color.White,
-                        modifier = Modifier.size(28.dp) // Taille exacte de l'icône
+                        modifier = Modifier.size(28.dp)
                     )
                 }
             }
@@ -70,7 +70,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                         ),
                         contentDescription = "Home",
                         tint = if (currentRoute == "home") Color(0xFF7F3C3C) else Color.White,
-                        modifier = Modifier.size(28.dp) // Taille exacte de l'icône
+                        modifier = Modifier.size(28.dp)
                     )
                 }
             }
@@ -97,7 +97,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                         ),
                         contentDescription = "Statistics",
                         tint = if (currentRoute == "stats") Color(0xFF7F3C3C) else Color.White,
-                        modifier = Modifier.size(28.dp) // Taille exacte de l'icône
+                        modifier = Modifier.size(28.dp)
                     )
                 }
             }
